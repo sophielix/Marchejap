@@ -510,22 +510,6 @@
   }
 
   /* ============================ RENDU : ACCUEIL ============================ */
-  function ringsSVG(fractions) {
-    // fractions: [{color, value}] rayon décroissant, comme les anneaux Forme.
-    const R = [62, 47, 32];
-    const stroke = 11;
-    let svg = `<svg class="rings-svg" viewBox="0 0 148 148">`;
-    fractions.forEach((f, i) => {
-      const r = R[i];
-      const c = 2 * Math.PI * r;
-      const frac = clamp(f.value, 0, 1);
-      svg += `<circle cx="74" cy="74" r="${r}" fill="none" stroke="${f.color}" stroke-opacity="0.18" stroke-width="${stroke}"/>`;
-      svg += `<circle cx="74" cy="74" r="${r}" fill="none" stroke="${f.color}" stroke-width="${stroke}" stroke-linecap="round"
-        stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - frac)}" transform="rotate(-90 74 74)"/>`;
-    });
-    svg += `</svg>`;
-    return svg;
-  }
 
   const TIPS = [
     "La marche japonaise alterne 3 min d'allure rapide et 3 min d'allure normale : c'est ce contraste d'intensité qui fait tout l'intérêt de la méthode, plus que la vitesse brute.",
@@ -556,22 +540,53 @@
     return TIPS[dayOfYear % TIPS.length];
   }
 
+  function greeting() {
+    const h = new Date().getHours();
+    if (h < 6) return { text: "BONNE NUIT", emoji: "🌙" };
+    if (h < 12) return { text: "BONJOUR", emoji: "☀️" };
+    if (h < 18) return { text: "BON APRÈS-MIDI", emoji: "☀️" };
+    return { text: "BONSOIR", emoji: "🌙" };
+  }
+
+  function computeDayStreak(all) {
+    if (!all.length) return 0;
+    const dateSet = new Set(all.map((s) => s.date));
+    let cursor = todayISO();
+    if (!dateSet.has(cursor)) {
+      cursor = addDaysISO(cursor, -1); // tolère l'absence de séance "aujourd'hui" : la série n'est pas encore rompue
+      if (!dateSet.has(cursor)) return 0;
+    }
+    let streak = 0;
+    while (dateSet.has(cursor)) { streak++; cursor = addDaysISO(cursor, -1); }
+    return streak;
+  }
+
+  function last7DaysActivity(all) {
+    const dateSet = new Set(all.map((s) => s.date));
+    const today = todayISO();
+    const days = [];
+    for (let i = 6; i >= 0; i--) {
+      const iso = addDaysISO(today, -i);
+      days.push({ iso, active: dateSet.has(iso), isToday: i === 0, letter: JOURS_LABEL_CAP[dateFromISO(iso).getDay()][0] });
+    }
+    return days;
+  }
+
   function renderAccueil() {
     const all = sortedSessions();
     const ctx = buildContext(all);
-    const goals = Store.getGoals();
+    const g = greeting();
     const container = $("#accueil-content");
 
+    const heroHTML = `
+      <div class="hero">
+        <p class="eyebrow">${g.text} ${g.emoji}</p>
+        <h1>Marche<br>Japonaise</h1>
+        <p class="jp">日本式ウォーキング</p>
+      </div>`;
+
     if (!all.length) {
-      container.innerHTML = `
-        <div class="rings-card" style="margin-bottom:18px;">
-          ${ringsSVG([{ color: "var(--red)", value: 0 }, { color: "var(--green)", value: 0 }, { color: "var(--cyan)", value: 0 }])}
-          <div class="rings-legend">
-            <div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><span class="lbl">Kcal du mois</span></div>
-            <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><span class="lbl">Distance du mois</span></div>
-            <div class="legend-row"><span class="legend-dot" style="background:var(--cyan)"></span><span class="lbl">Séances du mois</span></div>
-          </div>
-        </div>
+      container.innerHTML = heroHTML + `
         <div class="card empty-state">
           <span class="emoji">🚶‍♀️</span>
           <h3>Aucune séance enregistrée</h3>
@@ -590,38 +605,68 @@
       return;
     }
 
-    const thisMonth = monthKey(todayISO());
-    const monthSessions = all.filter((s) => monthKey(s.date) === thisMonth);
-    const mDist = monthSessions.reduce((a, s) => a + (s.distance || 0), 0);
-    const mKcal = monthSessions.reduce((a, s) => a + (s.kcal || 0), 0);
-    const mCount = monthSessions.length;
-
-    const fKcal = goals.kcal ? mKcal / goals.kcal : 0;
-    const fDist = goals.distance ? mDist / goals.distance : 0;
-    const fSeances = goals.seances ? mCount / goals.seances : 0;
-
-    const last5 = all.slice(-5).reverse();
+    const dayStreak = computeDayStreak(all);
+    const week = last7DaysActivity(all);
+    const totalIntervalles = ctx.count * 5; // 5 intervalles rapides par séance (5 cycles de 6 min sur 30 min)
+    const last = all[all.length - 1];
 
     container.innerHTML = `
-      <div class="rings-card">
-        ${ringsSVG([{ color: "var(--red)", value: fKcal }, { color: "var(--green)", value: fDist }, { color: "var(--cyan)", value: fSeances }])}
-        <div class="rings-legend">
-          <div class="legend-row"><span class="legend-dot" style="background:var(--red)"></span><b>${Math.round(mKcal)}</b><span class="lbl">/ ${goals.kcal} kcal</span></div>
-          <div class="legend-row"><span class="legend-dot" style="background:var(--green)"></span><b>${formatKmShort(mDist)}</b><span class="lbl">/ ${goals.distance} km</span></div>
-          <div class="legend-row"><span class="legend-dot" style="background:var(--cyan)"></span><b>${mCount}</b><span class="lbl">/ ${goals.seances} séances</span></div>
+      ${heroHTML}
+
+      <div class="stat-grid">
+        <div class="stat-tile blob-red">
+          <span class="icon">🚶</span>
+          <span class="val">${ctx.count}<span class="unit">séances</span></span>
+          <span class="lbl">Total</span>
+        </div>
+        <div class="stat-tile blob-blue">
+          <span class="icon">📏</span>
+          <span class="val">${formatKmShort(ctx.totalDistance)}<span class="unit">km</span></span>
+          <span class="lbl">Distance totale</span>
+        </div>
+        <div class="stat-tile blob-green">
+          <span class="icon">🔥</span>
+          <span class="val">${Math.round(ctx.totalKcal).toLocaleString("fr-FR")}<span class="unit">kcal</span></span>
+          <span class="lbl">Calories brûlées</span>
+        </div>
+        <div class="stat-tile blob-purple">
+          <span class="icon">⚡</span>
+          <span class="val">${totalIntervalles}<span class="unit">inter.</span></span>
+          <span class="lbl">Intervalles rapides</span>
         </div>
       </div>
 
-      <div class="stat-grid" style="margin-top:14px;">
-        <div class="stat-tile accent-green"><span class="val">${formatKmShort(ctx.totalDistance)} km</span><span class="lbl">Distance totale</span></div>
-        <div class="stat-tile accent-red"><span class="val">${Math.round(ctx.totalKcal).toLocaleString("fr-FR")}</span><span class="lbl">Kcal cumulées</span></div>
-        <div class="stat-tile accent-cyan"><span class="val">${ctx.count}</span><span class="lbl">Séances au total</span></div>
-        <div class="stat-tile accent-gold"><span class="val">${ctx.streakWeeks}</span><span class="lbl">Meilleure série (sem.)</span></div>
+      ${dayStreak > 0 ? `
+      <div class="streak-card">
+        <span class="flame">🔥</span>
+        <div>
+          <p class="title">${dayStreak} jour${dayStreak > 1 ? "s" : ""} de suite !</p>
+          <p class="sub">Continue comme ça — la régularité fait tout.</p>
+        </div>
+      </div>` : ""}
+
+      <h2 class="section-title" style="margin-top:22px;">Cette semaine</h2>
+      <div class="card">
+        <div class="week-strip">
+          ${week.map((d) => `
+            <div class="week-col ${d.active ? "active" : ""} ${d.isToday ? "today" : ""}">
+              <div class="week-bar"></div>
+              <div class="week-lbl">${d.letter}</div>
+            </div>`).join("")}
+        </div>
       </div>
 
-      <h2 class="section-title">Dernières séances</h2>
+      <div class="card" style="margin-top:18px;">
+        <div class="card-header-row">
+          <p class="card-title" style="margin:0;">Dernière séance</p>
+          <span class="pill">${formatDateLong(last.date).split(" ").slice(1).join(" ")}</span>
+        </div>
+        ${sessionRowHTML(last)}
+      </div>
+
+      <h2 class="section-title">Séances précédentes</h2>
       <div class="card" style="padding: 6px 18px;">
-        ${last5.map(sessionRowHTML).join("")}
+        ${all.slice(-6, -1).reverse().map(sessionRowHTML).join("") || `<p style="color:var(--text-secondary); font-size:13px; padding:12px 0;">Pas d'autre séance pour l'instant.</p>`}
       </div>
 
       <div class="card tip-card">
@@ -771,12 +816,17 @@
     return Array.from(map.values()).sort((a, b) => (a.key < b.key ? -1 : 1));
   }
   function miniBars(data, valueKey, labelFn, colorVar) {
-    const max = Math.max(1, ...data.map((d) => d[valueKey]));
-    return `<div class="bars">${data.map((d) => `
+    if (!data.length) return `<p style="color:var(--text-secondary); font-size:13px; margin:0;">Pas encore assez de données.</p>`;
+    const maxBarPx = 112; // hauteur max de la barre en pixels (laisse la place au libellé sous la barre)
+    const max = Math.max(1, ...data.map((d) => d[valueKey] || 0));
+    return `<div class="bars">${data.map((d) => {
+      const px = Math.max(3, Math.round(((d[valueKey] || 0) / max) * maxBarPx));
+      return `
       <div class="bar-col">
-        <div class="bar-shape" style="height:${clamp((d[valueKey] / max) * 100, 3, 100)}%; background:${colorVar}"></div>
+        <div class="bar-shape" style="height:${px}px; background:${colorVar}"></div>
         <div class="bar-lbl">${labelFn(d)}</div>
-      </div>`).join("")}</div>`;
+      </div>`;
+    }).join("")}</div>`;
   }
 
   function renderStats() {
@@ -1019,10 +1069,6 @@
   /* ============================ MODALE : RÉGLAGES / IMPORT / EXPORT ============================ */
   let pendingImportText = "";
   function openSettingsModal() {
-    const g = Store.getGoals();
-    $("#g-seances").value = g.seances;
-    $("#g-distance").value = g.distance;
-    $("#g-kcal").value = g.kcal;
     $("#import-preview").innerHTML = "";
     $("#import-file").value = "";
     $("#import-url").value = "";
@@ -1031,16 +1077,6 @@
     openModal("modal-settings");
   }
   $("#btn-settings").addEventListener("click", openSettingsModal);
-  $("#btn-save-goals").addEventListener("click", () => {
-    const g = {
-      seances: parseFRNumber($("#g-seances").value) || DEFAULT_GOALS.seances,
-      distance: parseFRNumber($("#g-distance").value) || DEFAULT_GOALS.distance,
-      kcal: parseFRNumber($("#g-kcal").value) || DEFAULT_GOALS.kcal,
-    };
-    Store.setGoals(g);
-    toast("Objectifs mis à jour", "🎯");
-    renderCurrentView();
-  });
 
   function updateImportPreview(text) {
     pendingImportText = text;
@@ -1114,18 +1150,10 @@
   });
 
   /* ============================ NAVIGATION ============================ */
-  const HEADER_EYEBROW = {
-    accueil: "Aujourd'hui",
-    trophees: "Collection",
-    stats: "Analyse",
-    lieux: "Exploration",
-    progres: "Records personnels",
-  };
   function switchView(view) {
     $$(".view").forEach((v) => v.classList.remove("active"));
     $("#view-" + view).classList.add("active");
     $$(".nav-btn").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
-    $("#header-eyebrow").textContent = HEADER_EYEBROW[view] || "";
     currentView = view;
     renderCurrentView();
   }

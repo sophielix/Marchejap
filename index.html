@@ -5,15 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
 <title>Marche japonaise</title>
 <meta name="description" content="Suivi de vos séances de marche japonaise (interval walking) : statistiques, records, lieux et trophées.">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#08080D">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚶</text></svg>">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <header class="app-header">
-  <p class="eyebrow" id="header-eyebrow">Aujourd'hui</p>
-  <h1 id="header-title">Marche japonaise</h1>
   <div class="header-actions">
     <button class="icon-btn" id="btn-settings" title="Objectifs & réglages" aria-label="Réglages">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
@@ -26,13 +24,6 @@
   <!-- ==================== ACCUEIL ==================== -->
   <section class="view active" id="view-accueil">
     <div id="accueil-content"></div>
-  </section>
-
-  <!-- ==================== TROPHÉES ==================== -->
-  <section class="view" id="view-trophees">
-    <h2 class="section-title first">Trophées</h2>
-    <p class="section-sub">150 trophées à débloquer, taillés pour le format exact de la marche japonaise.</p>
-    <div id="trophees-content"></div>
   </section>
 
   <!-- ==================== STATS ==================== -->
@@ -56,30 +47,37 @@
     <div id="progres-content"></div>
   </section>
 
+  <!-- ==================== TROPHÉES ==================== -->
+  <section class="view" id="view-trophees">
+    <h2 class="section-title first">Trophées</h2>
+    <p class="section-sub">150 trophées à débloquer, taillés pour le format exact de la marche japonaise.</p>
+    <div id="trophees-content"></div>
+  </section>
+
 </main>
 
 <button class="fab" id="btn-add-fab" title="Ajouter une séance" aria-label="Ajouter une séance">+</button>
 
 <nav class="bottom-nav" id="bottom-nav">
   <button class="nav-btn active" data-view="accueil">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>
+    <span class="nav-emoji">🏠</span>
     <span>Accueil</span>
   </button>
-  <button class="nav-btn" data-view="trophees">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"></path><path d="M17 5h3a2 2 0 0 1-2 4h-1M7 5H4a2 2 0 0 0 2 4h1"></path></svg>
-    <span>Trophées</span>
-  </button>
   <button class="nav-btn" data-view="stats">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><path d="M18 17V9M13 17V5M8 17v-4"></path></svg>
+    <span class="nav-emoji">📊</span>
     <span>Stats</span>
   </button>
   <button class="nav-btn" data-view="lieux">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+    <span class="nav-emoji">📍</span>
     <span>Lieux</span>
   </button>
   <button class="nav-btn" data-view="progres">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
+    <span class="nav-emoji">📈</span>
     <span>Progrès</span>
+  </button>
+  <button class="nav-btn" data-view="trophees">
+    <span class="nav-emoji">🏆</span>
+    <span>Trophées</span>
   </button>
 </nav>
 
@@ -166,24 +164,7 @@
       <span class="close-x" data-close="modal-settings">✕</span>
     </div>
 
-    <h3 class="card-title" style="margin-top:10px;">Objectifs mensuels (anneaux)</h3>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="g-seances">Séances / mois</label>
-        <input type="text" inputmode="numeric" id="g-seances">
-      </div>
-      <div class="form-group">
-        <label for="g-distance">Distance / mois (km)</label>
-        <input type="text" inputmode="decimal" id="g-distance">
-      </div>
-      <div class="form-group">
-        <label for="g-kcal">Kcal / mois</label>
-        <input type="text" inputmode="numeric" id="g-kcal">
-      </div>
-    </div>
-    <button class="btn btn-secondary" id="btn-save-goals">Enregistrer les objectifs</button>
-
-    <h3 class="card-title" style="margin-top:26px;">Importer un Google Sheet</h3>
+    <h3 class="card-title" style="margin-top:10px;">Importer un Google Sheet</h3>
     <p class="section-sub" style="margin-top:-4px;">
       Colonnes attendues : date, lieu, distance, météo, durée, fréquence cardiaque moyenne, rythme moyen,
       rythme de l'intervalle le plus rapide, rythme de l'intervalle le plus lent, kilocalories totales, commentaires.

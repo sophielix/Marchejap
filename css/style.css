@@ -7,27 +7,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg: #000000;
-  --bg-elevated: #17171A;
-  --bg-elevated-2: #212124;
-  --bg-elevated-3: #2C2C30;
+  --bg: #08080D;
+  --bg-elevated: #16161F;
+  --bg-elevated-2: #1E1E29;
+  --bg-elevated-3: #2A2A38;
   --text: #F5F5F7;
-  --text-secondary: #98989D;
-  --text-tertiary: #636366;
+  --text-secondary: #93939F;
+  --text-tertiary: #5C5C68;
 
-  --red: #FA2C55;
+  --red: #FA4360;
   --red-dim: #4A1220;
-  --green: #B8F227;
-  --green-dim: #22280A;
+  --green: #7FE87A;
+  --green-dim: #12280F;
   --cyan: #32D1E0;
   --cyan-dim: #0E2C30;
   --gold: #FFD60A;
-  --purple: #BF5AF2;
+  --purple: #B87CF2;
+  --blue: #4C9CFF;
+  --orange: #FF6E40;
+  --orange-dim: #3A2018;
 
   --separator: rgba(255, 255, 255, 0.08);
-  --radius-lg: 24px;
-  --radius: 18px;
-  --radius-sm: 12px;
+  --radius-lg: 26px;
+  --radius: 20px;
+  --radius-sm: 14px;
 
   --nav-h: 82px;
   --font-display: 'Manrope', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -59,30 +62,14 @@ button { font-family: inherit; }
 
 /* ---------------------------------------------------------------- Header */
 .app-header {
-  padding: 20px 20px 4px;
+  padding: 14px 20px 0;
   position: sticky;
   top: 0;
-  background: linear-gradient(var(--bg) 70%, transparent);
   z-index: 20;
-}
-.app-header .eyebrow {
-  font-size: 13px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 2px;
-}
-.app-header h1 {
-  font-size: 30px;
-  font-weight: 800;
-  margin: 0;
-  letter-spacing: -0.02em;
+  display: flex;
+  justify-content: flex-end;
 }
 .header-actions {
-  position: absolute;
-  right: 16px;
-  top: 18px;
   display: flex;
   gap: 8px;
 }
@@ -101,6 +88,33 @@ button { font-family: inherit; }
 .icon-btn svg { width: 20px; height: 20px; }
 .icon-btn:active { background: var(--bg-elevated-3); }
 
+/* ---------------------------------------------------------------- Hero (Accueil) */
+.hero {
+  margin: 4px 0 22px;
+}
+.hero .eyebrow {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 6px;
+}
+.hero h1 {
+  font-size: 44px;
+  font-weight: 800;
+  line-height: 1.04;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.hero .jp {
+  color: var(--orange);
+  font-weight: 700;
+  font-size: 19px;
+  margin: 8px 0 0;
+  letter-spacing: 0.02em;
+}
+
 /* ------------------------------------------------------------- Sections */
 main { padding: 4px 20px 40px; max-width: 720px; margin: 0 auto; }
 .view { display: none; animation: fadein .25s ease; }
@@ -108,7 +122,7 @@ main { padding: 4px 20px 40px; max-width: 720px; margin: 0 auto; }
 @keyframes fadein { from { opacity: 0; transform: translateY(6px);} to {opacity:1; transform:none;} }
 
 .section-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   margin: 28px 0 12px;
   letter-spacing: -0.01em;
@@ -162,34 +176,101 @@ main { padding: 4px 20px 40px; max-width: 720px; margin: 0 auto; }
 .legend-row b { font-size: 15px; font-weight: 800; }
 .legend-row .lbl { color: var(--text-secondary); }
 
-/* ---------------------------------------------------------- Stat grid */
+/* ---------------------------------------------------------- Stat grid (cartes à pastilles) */
 .stat-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
 }
 .stat-tile {
+  position: relative;
   background: var(--bg-elevated);
-  border-radius: var(--radius);
-  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  padding: 18px 18px 16px;
   border: 1px solid var(--separator);
+  overflow: hidden;
 }
+.stat-tile::after {
+  content: "";
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  filter: blur(2px);
+  opacity: 0.5;
+  background: var(--blob, transparent);
+}
+.stat-tile .icon { font-size: 26px; display: block; margin-bottom: 22px; position: relative; z-index: 1; }
 .stat-tile .val {
-  font-family: var(--font-mono);
-  font-size: 22px;
-  font-weight: 500;
+  font-size: 28px;
+  font-weight: 800;
   display: block;
+  position: relative; z-index: 1;
+  letter-spacing: -0.01em;
 }
+.stat-tile .val .unit { font-size: 15px; font-weight: 600; color: var(--text-secondary); margin-left: 4px; }
 .stat-tile .lbl {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text-secondary);
-  margin-top: 2px;
+  margin-top: 3px;
   display: block;
+  position: relative; z-index: 1;
 }
+.stat-tile.blob-red { --blob: radial-gradient(circle, rgba(250,67,96,.55), transparent 70%); }
+.stat-tile.blob-blue { --blob: radial-gradient(circle, rgba(76,156,255,.55), transparent 70%); }
+.stat-tile.blob-green { --blob: radial-gradient(circle, rgba(127,232,122,.5), transparent 70%); }
+.stat-tile.blob-purple { --blob: radial-gradient(circle, rgba(184,124,242,.5), transparent 70%); }
 .stat-tile.accent-red .val { color: var(--red); }
 .stat-tile.accent-green .val { color: var(--green); }
 .stat-tile.accent-cyan .val { color: var(--cyan); }
 .stat-tile.accent-gold .val { color: var(--gold); }
+
+/* ---------------------------------------------------------- Carte série (streak) */
+.streak-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(135deg, rgba(255,110,64,.16), var(--bg-elevated) 65%);
+  border: 1px solid rgba(255,110,64,.28);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin: 14px 0;
+}
+.streak-card .flame { font-size: 34px; flex-shrink: 0; }
+.streak-card .title { font-size: 19px; font-weight: 800; margin: 0 0 2px; }
+.streak-card .sub { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.4; }
+
+/* ---------------------------------------------------------- Bandeau "cette semaine" */
+.week-strip {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  height: 118px;
+  padding: 8px 4px 0;
+}
+.week-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; height: 100%; }
+.week-col .week-bar { width: 100%; max-width: 34px; border-radius: 10px; background: var(--bg-elevated-3); height: 6px; }
+.week-col.active .week-bar { background: linear-gradient(180deg, #FF8A5C, var(--orange)); height: 74px; }
+.week-col .week-lbl { font-size: 12px; font-weight: 700; color: var(--text-tertiary); }
+.week-col.today .week-lbl { color: var(--orange); }
+
+/* ---------------------------------------------------------- Carte "dernière séance" */
+.pill {
+  display: inline-block;
+  background: var(--green-dim);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 100px;
+}
+.card-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
 
 /* ---------------------------------------------------------- Records (podium) */
 .record-row {
@@ -298,6 +379,8 @@ main { padding: 4px 20px 40px; max-width: 720px; margin: 0 auto; }
   padding-top: 6px;
 }
 .nav-btn svg { width: 24px; height: 24px; }
+.nav-emoji { font-size: 23px; line-height: 1; transition: transform .15s ease; }
+.nav-btn.active .nav-emoji { transform: scale(1.12); }
 .nav-btn.active { color: var(--text); }
 .nav-btn.active svg { color: var(--green); }
 
@@ -442,8 +525,8 @@ input:focus, textarea:focus, select:focus { outline: 2px solid var(--green); out
 .bars {
   display: flex; align-items: flex-end; gap: 6px; height: 150px; padding-top: 10px;
 }
-.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-.bar-col .bar-shape { width: 100%; border-radius: 6px 6px 3px 3px; background: var(--green); min-height: 3px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; height: 100%; }
+.bar-col .bar-shape { width: 100%; border-radius: 6px 6px 3px 3px; background: var(--green); min-height: 3px; flex-shrink: 0; }
 .bar-col .bar-lbl { font-size: 10px; color: var(--text-tertiary); }
 
 .tip-card {

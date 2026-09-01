@@ -59,6 +59,17 @@ const errors = [];
   await new Promise((r) => setTimeout(r, 20));
   $("#btn-import-run").click();
 
+  // -- Vérification du graphique "par semaine" (bug des barres invisibles) --
+  doc.querySelector('.nav-btn[data-view="stats"]').click();
+  await new Promise((r) => setTimeout(r, 10));
+  const barShapes = Array.from(doc.querySelectorAll(".bar-shape"));
+  if (!barShapes.length) errors.push("Aucune barre trouvée dans les graphiques stats");
+  else {
+    const heights = barShapes.map((el) => parseInt(el.style.height, 10) || 0);
+    if (heights.every((h) => h === 0)) errors.push("Toutes les barres ont une hauteur de 0px (bug non corrigé)");
+    console.log("Hauteurs de barres détectées :", heights.slice(0, 6).join(", "), "px ...");
+  }
+
   // -- Navigation dans tous les onglets --
   for (const view of ["accueil", "trophees", "stats", "lieux", "progres"]) {
     doc.querySelector(`.nav-btn[data-view="${view}"]`).click();
@@ -71,6 +82,16 @@ const errors = [];
   if (!window.URL.revokeObjectURL) window.URL.revokeObjectURL = () => {};
   doc.getElementById("btn-export-csv").click();
   doc.querySelector('[data-close="modal-settings"]').click();
+
+  // -- Vérification du nouveau design de l'Accueil --
+  doc.querySelector('.nav-btn[data-view="accueil"]').click();
+  await new Promise((r) => setTimeout(r, 10));
+  if (!doc.querySelector(".hero h1")) errors.push("Titre hero manquant sur l'Accueil");
+  if (doc.querySelectorAll(".stat-tile.blob-red, .stat-tile.blob-blue, .stat-tile.blob-green, .stat-tile.blob-purple").length !== 4)
+    errors.push("Les 4 cartes stat à pastille ne sont pas toutes présentes");
+  if (!doc.querySelector(".week-strip") || doc.querySelectorAll(".week-col").length !== 7)
+    errors.push("Le bandeau 'cette semaine' n'a pas 7 colonnes");
+  console.log("Streak card présente :", !!doc.querySelector(".streak-card"));
 
   const sessions = JSON.parse(window.localStorage.getItem("mj_sessions_v1") || "[]");
   console.log("Séances stockées après ajout + import :", sessions.length);
