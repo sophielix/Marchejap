@@ -1,8 +1,24 @@
 # Marche japonaise 🚶
 
-Application de suivi de vos séances de marche japonaise (marche rapide 3 min /
-marche normale 3 min, sur 30 minutes). Toutes les données restent **en local
-sur votre téléphone** (localStorage) — rien n'est envoyé à un serveur.
+Application de suivi de vos séances de marche — **marche japonaise** (marche
+rapide 3 min / marche normale 3 min, sur 30 minutes) et **marche normale**
+(classique, sans structure d'intervalles). Toutes les données restent **en
+local sur votre téléphone** (localStorage) — rien n'est envoyé à un serveur.
+
+## Les deux formats de marche
+
+À la création d'une séance, choisissez le type :
+- **🎌 Marche japonaise** : rythme moyen + intervalles rapide/lent au format
+  min'sec/km, comme avant.
+- **🚶 Marche normale** : un seul champ de vitesse, exprimé en **km/h**
+  (calculé automatiquement à partir de la distance et de la durée si vous le
+  laissez vide). Pas de champs d'intervalles, non pertinents pour ce format.
+
+Les statistiques, records et trophées distinguent les deux formats partout
+où c'est pertinent (bouton de bascule 🎌 / 🚶 en haut des pages concernées).
+Le total de 150 trophées "marche japonaise" ne compte que les séances de ce
+type ; 40 trophées supplémentaires, adaptés au format libre de la marche
+normale, s'y ajoutent (190 au total).
 
 ## Mettre en ligne sur GitHub Pages
 
@@ -17,10 +33,11 @@ sur votre téléphone** (localStorage) — rien n'est envoyé à un serveur.
 ## Importer votre Google Sheet
 
 Colonnes attendues (l'ordre n'a pas d'importance, les intitulés sont reconnus
-même avec des variantes) : `date`, `lieu`, `distance`, `météo`, `durée`,
-`fréquence cardiaque moyenne`, `rythme moyen`, `rythme de l'intervalle le plus
-rapide`, `rythme de l'intervalle le plus lent`, `kilocalories totales`,
-`commentaires`.
+même avec des variantes) : `date`, `type` *(optionnel — "Marche japonaise" ou
+"Marche normale", "Marche japonaise" par défaut si absent)*, `lieu`, `distance`,
+`météo`, `durée`, `fréquence cardiaque moyenne`, `rythme moyen`, `rythme de
+l'intervalle le plus rapide`, `rythme de l'intervalle le plus lent`,
+`kilocalories totales`, `commentaires`.
 
 Trois façons d'importer, dans **Réglages → Importer un Google Sheet** :
 
@@ -52,3 +69,16 @@ navigateur, ou servez le dossier avec un petit serveur local
 
 Un test de fumée headless est fourni dans `test/smoke.js` (nécessite
 `npm install jsdom` au préalable) : `node test/smoke.js`.
+
+## Après une mise à jour (important sur iPhone)
+
+Les icônes ajoutées à l'écran d'accueil gardent parfois en cache l'ancienne
+version. Deux réflexes à chaque mise à jour du code :
+
+1. Dans `index.html`, incrémentez le `?v=...` à la fin des liens
+   `css/style.css` et `js/*.js` (ex. `?v=2026090102`) — ça force le
+   téléphone à retélécharger les fichiers modifiés.
+2. Si le raccourci sur l'écran d'accueil affiche quand même l'ancienne
+   version : supprimez-le, videz le cache du site dans
+   `Réglages > Safari > Avancé > Données de sites`, rechargez l'URL dans
+   Safari, puis recréez le raccourci (`Partager > Sur l'écran d'accueil`).
